@@ -6,6 +6,8 @@ use std::{
 
 use clap::Parser;
 
+type MyResult<T> = Result<T, Box<dyn Error>>;
+
 #[derive(Parser, Debug)]
 #[command(name = "catr")]
 #[command(author = "zuya@microsoft.com")]
@@ -25,8 +27,6 @@ pub struct Config {
     number_nonblank_lines: bool,
 }
 
-type MyResult<T> = Result<T, Box<dyn Error>>;
-
 pub fn get_args() -> MyResult<Config> {
     let config = Config::parse();
     Ok(config)
@@ -35,11 +35,11 @@ pub fn get_args() -> MyResult<Config> {
 pub fn run(config: Config) -> MyResult<()> {
     if config.number_lines {
         return echo_number(config.files);
-    } else if config.number_nonblank_lines {
-        return echo_non_blank_number(config.files);
-    } else {
-        echo(config.files)
     }
+    if config.number_nonblank_lines {
+        return echo_non_blank_number(config.files);
+    }
+    echo(config.files)
 }
 
 fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
